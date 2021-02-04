@@ -1,25 +1,39 @@
-export class Grid {
-  state: {}[][];
-  constructor(x: number, y: number) {
-    this.state = this.generateState(x, y);
+type CellState = 'dead' | 'alive';
+
+export class Cell {
+  state: CellState;
+
+  constructor(initialState: CellState) {
+    this.state = initialState;
   }
 
-  generateState(x: number, y: number): {}[][] {
+  getState(): CellState {
+    return this.state;
+  }
+}
+
+export class Grid {
+  state: {}[][];
+  constructor(x: number, y: number, cell: Cell) {
+    this.state = this.generateState(x, y, cell);
+  }
+
+  generateState(x: number, y: number, cell: Cell): {}[][] {
     let result = [] as any;
     for (let i = 0; i < y; i++) {
       result[i] = [];
       for (let j = 0; j < x; j++) {
-        result[i][j] = {};
+        result[i][j] = cell;
       }
     }
     return result;
   }
 
-  getState() {
+  getState(): {}[][] {
     return this.state;
   }
 
-  getStateOfCell(x: number, y: number): 'dead' {
-    return 'dead';
+  getItemInPosition(x: number, y: number): any {
+    return this.state[x][y]
   }
 }

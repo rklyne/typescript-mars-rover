@@ -36,6 +36,11 @@ describe("Grid", () => {
 
   it("has a dead state", () => {
     let grid: Grid = new Grid(1, 1);
-    expect(grid.getStateOfCell([0, 0])).toBe("dead");
+    expect(grid.getStateOfCell(0, 0)).toBe("dead");
+  });
+
+  it("has an alive state", () => {
+    let grid: Grid = new Grid(1, 1);
+    expect(grid.getStateOfCell(0, 0)).toBe("alive");
   });
 });

@@ -18,4 +18,8 @@ export class Grid {
   getState() {
     return this.state;
   }
+
+  getStateOfCell(x: number, y: number): 'dead' {
+    return 'dead';
+  }
 }

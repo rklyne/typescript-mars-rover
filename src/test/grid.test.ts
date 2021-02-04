@@ -40,7 +40,7 @@ describe("Grid", () => {
   });
 
   it("has an alive state", () => {
-    let grid: Grid = new Grid(1, 1);
+    let grid: Grid = new Grid(1, 1, new Cell("alive"));
     expect(grid.getStateOfCell(0, 0)).toBe("alive");
   });
 });

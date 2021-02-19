@@ -1,8 +1,15 @@
-import {Example} from "../main/example";
 
-describe('example test', () => {
-    it("should give sum of a + b when adding a and b", () => {
-        let example: Example = new Example();
-        expect(example.add(1, 2)).toBe(3);
+class Rover {
+    getPosition() {
+        return ''
+    }
+}
+
+describe('mars rover', () => {
+    it("the rover has an initial position on the plateau", () => {
+        const rover = new Rover()
+        const initialPosition = rover.getPosition()
+
+        expect(initialPosition).toBe('0:0:N')
     })
 })

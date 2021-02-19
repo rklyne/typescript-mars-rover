@@ -52,7 +52,12 @@ class Rover {
   }
 
   private moveForwards() {
-    this.moveNorth()
+    switch (this.position[2]) {
+      case 'N':
+        return this.moveNorth();
+      default:
+        throw new Error(`What even is "${this.position[2]}"`)
+    }
   }
 
   private moveNorth() {
@@ -111,14 +116,12 @@ describe("mars rover", () => {
     expect(position).toBe(initialPosition);
   })
 
-  // We weren't ready for this one
-  //
-  // it("the rover position will be '2:3:N' given the command 'MMRMMLM", () => {
-  //   const rover = new Rover();
-  //   rover.command('MMRMMLM');
-  //   const position = rover.getPosition();
-  //   expect(position).toBe('2:3:N');
-  // })
+  it("the rover position will be '2:3:N' given the command 'MMRMMLM", () => {
+    const rover = new Rover();
+    rover.command('MMRMMLM');
+    const position = rover.getPosition();
+    expect(position).toBe('2:3:N');
+  })
 
   it("can move forwards twice and get to '0:2:N'", () => {
     const rover = new Rover();

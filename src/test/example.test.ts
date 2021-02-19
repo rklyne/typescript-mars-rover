@@ -7,8 +7,12 @@ class Rover {
   constructor() {
     this.position = [0, 0, "N"];
   }
-  getPosition() {
+
+  getPosition(): string {
     return this.position.join(":");
+  }
+
+  command(_command: string) {
   }
 }
 
@@ -18,5 +22,12 @@ describe("mars rover", () => {
     const initialPosition = rover.getPosition();
 
     expect(initialPosition).toBe("0:0:N");
+  });
+
+  it("the rover can move forward on command 'M'", () => {
+    const rover = new Rover();
+    rover.command('M');
+    const position = rover.getPosition();
+    expect(position).toBe('0:1:N');
   });
 });

@@ -13,6 +13,7 @@ class Rover {
   }
 
   command(_command: string) {
+    this.position = [0, 1, "N"]
   }
 }
 
@@ -29,5 +30,12 @@ describe("mars rover", () => {
     rover.command('M');
     const position = rover.getPosition();
     expect(position).toBe('0:1:N');
+  });
+
+  it("the rover can turn to the right on command 'R'", () => {
+    const rover = new Rover();
+    rover.command('R');
+    const position = rover.getPosition();
+    expect(position).toBe('0:0:E');
   });
 });

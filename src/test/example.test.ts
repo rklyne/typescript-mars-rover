@@ -27,15 +27,21 @@ const setPosition = (
   return { ...state, positionHistory: [newPosition, ...state.positionHistory] };
 };
 
+const changePosition = (
+  state: RoverState,
+  mutator: (position: RoverPosition) => RoverPosition
+): RoverState => {
+  return setPosition(state, mutator(getPosition(state)));
+};
+
 const undoMovement: RoverCommand = (state) => {
   const newHistory = [...state.positionHistory];
   newHistory.shift();
   return { ...state, positionHistory: newHistory };
 };
 
-const turnLeft: RoverCommand = (state) => {
-  const position = getPosition(state);
-  return setPosition(state, [
+const turnLeft: RoverCommand = (state) =>
+  changePosition(state, (position) => [
     position[0],
     position[1],
     ({
@@ -45,11 +51,8 @@ const turnLeft: RoverCommand = (state) => {
       W: "S",
     } as const)[position[2]],
   ]);
-};
-
-const turnRight: RoverCommand = (state) => {
-  const position = getPosition(state);
-  return setPosition(state, [
+const turnRight: RoverCommand = (state) =>
+  changePosition(state, (position) => [
     position[0],
     position[1],
     ({
@@ -59,37 +62,40 @@ const turnRight: RoverCommand = (state) => {
       W: "N",
     } as const)[position[2]],
   ]);
-};
+const moveForwards: RoverCommand = (state) =>
+  changePosition(state, (position) => {
+    const newPosition: RoverPosition = [...position];
+    switch (position[2]) {
+      case "N":
+        newPosition[1] += 1;
+        break;
+      case "E":
+        newPosition[0] += 1;
+        break;
+      case "S":
+        newPosition[1] -= 1;
+        break;
+      case "W":
+        newPosition[0] -= 1;
+        break;
+      default:
+        throw new Error(`What even is "${newPosition[2]}"`);
+    }
+    const height = 10;
+    const width = 10;
+    newPosition[0] %= width;
+    newPosition[1] %= height;
 
-const moveForwards: RoverCommand = (state) => {
-  const position = getPosition(state);
-  const newPosition: RoverPosition = [...position];
-  switch (position[2]) {
-    case "N":
-      newPosition[1] += 1;
-      break;
-    case "E":
-      newPosition[0] += 1;
-      break;
-    case "S":
-      newPosition[1] -= 1;
-      break;
-    case "W":
-      newPosition[0] -= 1;
-      break;
-    default:
-      throw new Error(`What even is "${newPosition[2]}"`);
-  }
-  const height = 10;
-  const width = 10;
-  newPosition[0] %= width;
-  newPosition[1] %= height;
-
-  return setPosition(state, newPosition);
-};
+    return newPosition;
+  });
 
 const isRoverInput = (maybeInput: string): maybeInput is RoverInput => {
-  return maybeInput === "U" || maybeInput === "L" || maybeInput === "R" || maybeInput === "M";
+  return (
+    maybeInput === "U" ||
+    maybeInput === "L" ||
+    maybeInput === "R" ||
+    maybeInput === "M"
+  );
 };
 
 class Rover {

@@ -1,8 +1,15 @@
 type Direction = "N" | "S" | "E" | "W";
 type RoverPosition = [number, number, Direction];
 
+type RoverInput = "R" | "L" | "M";
+
 type RoverCommand = (position: RoverPosition) => RoverPosition;
 
+/*
+ *   N
+ * W   E
+ *   S
+ */
 const turnLeft: RoverCommand = (position) => {
   return [
     position[0],
@@ -29,8 +36,8 @@ const turnRight: RoverCommand = (position) => {
   ];
 };
 
-const moveForwards: RoverCommand = position => {
-  const newPosition: RoverPosition = [...position]
+const moveForwards: RoverCommand = (position) => {
+  const newPosition: RoverPosition = [...position];
   switch (position[2]) {
     case "N":
       newPosition[1] += 1;
@@ -52,11 +59,20 @@ const moveForwards: RoverCommand = position => {
   newPosition[0] %= width;
   newPosition[1] %= height;
 
-  return newPosition
-}
+  return newPosition;
+};
 
+const isRoverInput = (maybeInput: string): maybeInput is RoverInput => {
+  return maybeInput === "L" || maybeInput === "R" || maybeInput === "M";
+};
 
 class Rover {
+  static roverCommands: Record<RoverInput, RoverCommand> = {
+    R: turnRight,
+    L: turnLeft,
+    M: moveForwards,
+  };
+
   position: RoverPosition;
 
   constructor() {
@@ -67,37 +83,21 @@ class Rover {
     return this.position.join(":");
   }
 
-  command(commands: string) {
-    for (const command of commands) {
-      this.singleCommand(command);
+  command(inputs: string) {
+    for (const input of inputs) {
+      if (isRoverInput(input)) {
+        this.singleCommand(input);
+      } else {
+        throw `Invalid input received: ${input}`;
+      }
     }
   }
 
-  private singleCommand(_command: string) {
-    if (_command === "R") {
-      this.turnRight();
-    } else if (_command === "L") {
-      this.turnLeft();
-    } else {
-      this.moveForwards();
+  private singleCommand(input: RoverInput) {
+    const roverCommand = Rover.roverCommands[input];
+    if (roverCommand) {
+      this.position = roverCommand(this.position);
     }
-  }
-
-  /*
-   *   N
-   * W   E
-   *   S
-   */
-  private turnRight() {
-    this.position = turnRight(this.position);
-  }
-
-  private turnLeft() {
-    this.position = turnLeft(this.position);
-  }
-
-  private moveForwards() {
-    this.position = moveForwards(this.position)
   }
 }
 

@@ -8,8 +8,6 @@ class Rover {
     this.position = [0, 0, "N"];
   }
 
-  addObstacle(x: number, y: number) {}
-
   getPosition(): string {
     return this.position.join(":");
   }
@@ -189,15 +187,5 @@ describe("mars rover", () => {
     rover.command("RRMMMMMMMMMMRR");
     const position = rover.getPosition();
     expect(position).toBe("0:0:N");
-  });
-
-  describe("with an obstacle at (0,2)", () => {
-    it("the position after MMMM is 'O:0:2:N'", () => {
-      const rover = new Rover();
-      rover.addObstacle(0, 2);
-      rover.command("MMMM");
-      const position = rover.getPosition();
-      expect(position).toBe("O:0:2:N");
-    });
   });
 });

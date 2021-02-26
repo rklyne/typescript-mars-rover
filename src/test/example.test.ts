@@ -1,10 +1,10 @@
 type Direction = "N" | "S" | "E" | "W";
 type RoverPosition = [number, number, Direction];
 
-type RoverInput = "R" | "L" | "M";
+type RoverInput = "R" | "L" | "M" | "U";
 
 type RoverCommand = (position: RoverState) => RoverState;
-type RoverState = {positionHistory: RoverPosition[]};
+type RoverState = { positionHistory: RoverPosition[] };
 
 /*
  *   N
@@ -24,7 +24,13 @@ const setPosition = (
   state: RoverState,
   newPosition: RoverPosition
 ): RoverState => {
-  return {...state, positionHistory: [newPosition, ...state.positionHistory]}
+  return { ...state, positionHistory: [newPosition, ...state.positionHistory] };
+};
+
+const undoMovement: RoverCommand = (state) => {
+  const newHistory = [...state.positionHistory];
+  newHistory.shift();
+  return { ...state, positionHistory: newHistory };
 };
 
 const turnLeft: RoverCommand = (state) => {
@@ -83,7 +89,7 @@ const moveForwards: RoverCommand = (state) => {
 };
 
 const isRoverInput = (maybeInput: string): maybeInput is RoverInput => {
-  return maybeInput === "L" || maybeInput === "R" || maybeInput === "M";
+  return maybeInput === "U" || maybeInput === "L" || maybeInput === "R" || maybeInput === "M";
 };
 
 class Rover {
@@ -91,6 +97,7 @@ class Rover {
     R: turnRight,
     L: turnLeft,
     M: moveForwards,
+    U: undoMovement,
   };
 
   state: RoverState;
@@ -215,5 +222,12 @@ describe("mars rover", () => {
     rover.executeInputs("RRMMMMMMMMMMRR");
     const position = rover.getPosition();
     expect(position).toBe("0:0:N");
+  });
+
+  it("the rover can move forward one space on input 'MMU'", () => {
+    const rover = new Rover();
+    rover.executeInputs("MMU");
+    const position = rover.getPosition();
+    expect(position).toBe("0:1:N");
   });
 });

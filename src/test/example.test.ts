@@ -1,9 +1,9 @@
 type Direction = "N" | "S" | "E" | "W";
 type RoverPosition = [number, number, Direction];
 
-type Command = (position: RoverPosition) => RoverPosition;
+type RoverCommand = (position: RoverPosition) => RoverPosition;
 
-const turnLeft: Command = (position) => {
+const turnLeft: RoverCommand = (position) => {
   return [
     position[0],
     position[1],
@@ -16,7 +16,7 @@ const turnLeft: Command = (position) => {
   ];
 };
 
-const turnRight: Command = (position) => {
+const turnRight: RoverCommand = (position) => {
   return [
     position[0],
     position[1],
@@ -28,6 +28,33 @@ const turnRight: Command = (position) => {
     } as const)[position[2]],
   ];
 };
+
+const moveForwards: RoverCommand = position => {
+  const newPosition: RoverPosition = [...position]
+  switch (position[2]) {
+    case "N":
+      newPosition[1] += 1;
+      break;
+    case "E":
+      newPosition[0] += 1;
+      break;
+    case "S":
+      newPosition[1] -= 1;
+      break;
+    case "W":
+      newPosition[0] -= 1;
+      break;
+    default:
+      throw new Error(`What even is "${newPosition[2]}"`);
+  }
+  const height = 10;
+  const width = 10;
+  newPosition[0] %= width;
+  newPosition[1] %= height;
+
+  return newPosition
+}
+
 
 class Rover {
   position: RoverPosition;
@@ -70,46 +97,7 @@ class Rover {
   }
 
   private moveForwards() {
-    switch (this.position[2]) {
-      case "N":
-        this.moveNorth();
-        break;
-      case "E":
-        this.moveEast();
-        break;
-      case "S":
-        this.moveSouth();
-        break;
-      case "W":
-        this.moveWest();
-        break;
-      default:
-        throw new Error(`What even is "${this.position[2]}"`);
-    }
-    this.wrapAroundPlateau();
-  }
-
-  private moveNorth() {
-    this.position[1] += 1;
-  }
-
-  private moveSouth() {
-    this.position[1] -= 1;
-  }
-
-  private moveEast() {
-    this.position[0] += 1;
-  }
-
-  private moveWest() {
-    this.position[0] -= 1;
-  }
-
-  private wrapAroundPlateau() {
-    const height = 10;
-    const width = 10;
-    this.position[0] %= width;
-    this.position[1] %= height;
+    this.position = moveForwards(this.position)
   }
 }
 

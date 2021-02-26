@@ -4,7 +4,7 @@ type RoverPosition = [number, number, Direction];
 type RoverInput = "R" | "L" | "M";
 
 type RoverCommand = (position: RoverState) => RoverState;
-type RoverState = RoverPosition; // for now...
+type RoverState = {position: RoverPosition}; // for now...
 
 /*
  *   N
@@ -12,14 +12,14 @@ type RoverState = RoverPosition; // for now...
  *   S
  */
 const getPosition = (state: RoverState): RoverPosition => {
-  return state;
+  return state.position;
 };
 
 const setPosition = (
   state: RoverState,
   newPosition: RoverPosition
 ): RoverState => {
-  return newPosition;
+  return {...state, position: newPosition}
 };
 
 const turnLeft: RoverCommand = (state) => {
@@ -52,7 +52,7 @@ const turnRight: RoverCommand = (state) => {
 
 const moveForwards: RoverCommand = (state) => {
   const position = getPosition(state);
-  const newPosition: RoverState = [...position];
+  const newPosition: RoverPosition = [...position];
   switch (position[2]) {
     case "N":
       newPosition[1] += 1;
@@ -88,14 +88,14 @@ class Rover {
     M: moveForwards,
   };
 
-  position: RoverState;
+  state: RoverState;
 
   constructor() {
-    this.position = [0, 0, "N"];
+    this.state = {position: [0, 0, "N"]};
   }
 
   getPosition(): string {
-    return this.position.join(":");
+    return this.state.position.join(":");
   }
 
   executeInputs(inputs: string) {
@@ -114,7 +114,7 @@ class Rover {
   }
 
   private executeCommand(roverCommand: RoverCommand): void {
-    this.position = roverCommand(this.position);
+    this.state = roverCommand(this.state);
   }
 }
 

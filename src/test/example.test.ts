@@ -1,6 +1,34 @@
 type Direction = "N" | "S" | "E" | "W";
 type RoverPosition = [number, number, Direction];
 
+type Command = (position: RoverPosition) => RoverPosition;
+
+const turnLeft: Command = (position) => {
+  return [
+    position[0],
+    position[1],
+    ({
+      N: "W",
+      E: "N",
+      S: "E",
+      W: "S",
+    } as const)[position[2]],
+  ];
+};
+
+const turnRight: Command = (position) => {
+  return [
+    position[0],
+    position[1],
+    ({
+      N: "E",
+      E: "S",
+      S: "W",
+      W: "N",
+    } as const)[position[2]],
+  ];
+};
+
 class Rover {
   position: RoverPosition;
 
@@ -34,21 +62,11 @@ class Rover {
    *   S
    */
   private turnRight() {
-    this.position[2] = ({
-      N: "E",
-      E: "S",
-      S: "W",
-      W: "N",
-    } as const)[this.position[2]];
+    this.position = turnRight(this.position);
   }
 
   private turnLeft() {
-    this.position[2] = ({
-      N: "W",
-      E: "N",
-      S: "E",
-      W: "S",
-    } as const)[this.position[2]];
+    this.position = turnLeft(this.position);
   }
 
   private moveForwards() {

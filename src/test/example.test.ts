@@ -34,21 +34,21 @@ class Rover {
    *   S
    */
   private turnRight() {
-    this.position[2] = {
-      N: "E" as Direction,
-      E: "S" as Direction,
-      S: "W" as Direction,
-      W: "N" as Direction,
-    }[this.position[2]];
+    this.position[2] = ({
+      N: "E",
+      E: "S",
+      S: "W",
+      W: "N",
+    } as const)[this.position[2]];
   }
 
   private turnLeft() {
-    this.position[2] = {
-      N: "W" as Direction,
-      E: "N" as Direction,
-      S: "E" as Direction,
-      W: "S" as Direction,
-    }[this.position[2]];
+    this.position[2] = ({
+      N: "W",
+      E: "N",
+      S: "E",
+      W: "S",
+    } as const)[this.position[2]];
   }
 
   private moveForwards() {

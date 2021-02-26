@@ -4,22 +4,27 @@ type RoverPosition = [number, number, Direction];
 type RoverInput = "R" | "L" | "M";
 
 type RoverCommand = (position: RoverState) => RoverState;
-type RoverState = {position: RoverPosition}; // for now...
+type RoverState = {positionHistory: RoverPosition[]};
 
 /*
  *   N
  * W   E
  *   S
  */
+
+const initialState: RoverState = {
+  positionHistory: [[0, 0, "N"]],
+};
+
 const getPosition = (state: RoverState): RoverPosition => {
-  return state.position;
+  return state.positionHistory[0];
 };
 
 const setPosition = (
   state: RoverState,
   newPosition: RoverPosition
 ): RoverState => {
-  return {...state, position: newPosition}
+  return {...state, positionHistory: [newPosition, ...state.positionHistory]}
 };
 
 const turnLeft: RoverCommand = (state) => {
@@ -91,11 +96,11 @@ class Rover {
   state: RoverState;
 
   constructor() {
-    this.state = {position: [0, 0, "N"]};
+    this.state = initialState;
   }
 
   getPosition(): string {
-    return this.state.position.join(":");
+    return getPosition(this.state).join(":");
   }
 
   executeInputs(inputs: string) {

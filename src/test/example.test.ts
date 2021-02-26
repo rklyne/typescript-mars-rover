@@ -3,15 +3,28 @@ type RoverPosition = [number, number, Direction];
 
 type RoverInput = "R" | "L" | "M";
 
-type RoverCommand = (position: RoverPosition) => RoverPosition;
+type RoverCommand = (position: RoverState) => RoverState;
+type RoverState = RoverPosition; // for now...
 
 /*
  *   N
  * W   E
  *   S
  */
-const turnLeft: RoverCommand = (position) => {
-  return [
+const getPosition = (state: RoverState): RoverPosition => {
+  return state;
+};
+
+const setPosition = (
+  state: RoverState,
+  newPosition: RoverPosition
+): RoverState => {
+  return newPosition;
+};
+
+const turnLeft: RoverCommand = (state) => {
+  const position = getPosition(state);
+  return setPosition(state, [
     position[0],
     position[1],
     ({
@@ -20,11 +33,12 @@ const turnLeft: RoverCommand = (position) => {
       S: "E",
       W: "S",
     } as const)[position[2]],
-  ];
+  ]);
 };
 
-const turnRight: RoverCommand = (position) => {
-  return [
+const turnRight: RoverCommand = (state) => {
+  const position = getPosition(state);
+  return setPosition(state, [
     position[0],
     position[1],
     ({
@@ -33,11 +47,12 @@ const turnRight: RoverCommand = (position) => {
       S: "W",
       W: "N",
     } as const)[position[2]],
-  ];
+  ]);
 };
 
-const moveForwards: RoverCommand = (position) => {
-  const newPosition: RoverPosition = [...position];
+const moveForwards: RoverCommand = (state) => {
+  const position = getPosition(state);
+  const newPosition: RoverState = [...position];
   switch (position[2]) {
     case "N":
       newPosition[1] += 1;
@@ -59,7 +74,7 @@ const moveForwards: RoverCommand = (position) => {
   newPosition[0] %= width;
   newPosition[1] %= height;
 
-  return newPosition;
+  return setPosition(state, newPosition);
 };
 
 const isRoverInput = (maybeInput: string): maybeInput is RoverInput => {
@@ -73,7 +88,7 @@ class Rover {
     M: moveForwards,
   };
 
-  position: RoverPosition;
+  position: RoverState;
 
   constructor() {
     this.position = [0, 0, "N"];
@@ -83,21 +98,23 @@ class Rover {
     return this.position.join(":");
   }
 
-  command(inputs: string) {
+  executeInputs(inputs: string) {
     for (const input of inputs) {
       if (isRoverInput(input)) {
-        this.singleCommand(input);
+        this.executeInput(input);
       } else {
         throw `Invalid input received: ${input}`;
       }
     }
   }
 
-  private singleCommand(input: RoverInput) {
+  private executeInput(input: RoverInput) {
     const roverCommand = Rover.roverCommands[input];
-    if (roverCommand) {
-      this.position = roverCommand(this.position);
-    }
+    this.executeCommand(roverCommand);
+  }
+
+  private executeCommand(roverCommand: RoverCommand): void {
+    this.position = roverCommand(this.position);
   }
 }
 
@@ -109,16 +126,16 @@ describe("mars rover", () => {
     expect(initialPosition).toBe("0:0:N");
   });
 
-  it("the rover can move forward on command 'M'", () => {
+  it("the rover can move forward on input 'M'", () => {
     const rover = new Rover();
-    rover.command("M");
+    rover.executeInputs("M");
     const position = rover.getPosition();
     expect(position).toBe("0:1:N");
   });
 
-  it("the rover can turn to the right on command 'R'", () => {
+  it("the rover can turn to the right on input 'R'", () => {
     const rover = new Rover();
-    rover.command("R");
+    rover.executeInputs("R");
     const position = rover.getPosition();
     expect(position).toBe("0:0:E");
   });
@@ -126,17 +143,17 @@ describe("mars rover", () => {
   it("the rover can turn right four times and not change position", () => {
     const rover = new Rover();
     const initialPosition = rover.getPosition();
-    rover.command("R");
-    rover.command("R");
-    rover.command("R");
-    rover.command("R");
+    rover.executeInputs("R");
+    rover.executeInputs("R");
+    rover.executeInputs("R");
+    rover.executeInputs("R");
     const position = rover.getPosition();
     expect(position).toBe(initialPosition);
   });
 
-  it("the rover can turn to the left on command 'L'", () => {
+  it("the rover can turn to the left on input 'L'", () => {
     const rover = new Rover();
-    rover.command("L");
+    rover.executeInputs("L");
     const position = rover.getPosition();
     expect(position).toBe("0:0:W");
   });
@@ -144,53 +161,53 @@ describe("mars rover", () => {
   it("the rover can turn left four times and not change position", () => {
     const rover = new Rover();
     const initialPosition = rover.getPosition();
-    rover.command("L");
-    rover.command("L");
-    rover.command("L");
-    rover.command("L");
+    rover.executeInputs("L");
+    rover.executeInputs("L");
+    rover.executeInputs("L");
+    rover.executeInputs("L");
     const position = rover.getPosition();
     expect(position).toBe(initialPosition);
   });
 
   it("can move forwards twice and get to '0:2:N'", () => {
     const rover = new Rover();
-    rover.command("M");
-    rover.command("M");
+    rover.executeInputs("M");
+    rover.executeInputs("M");
     const position = rover.getPosition();
     expect(position).toBe("0:2:N");
   });
 
-  it("the rover position will be '2:3:N' given the command 'MMRMMLM", () => {
+  it("the rover position will be '2:3:N' given the input 'MMRMMLM", () => {
     const rover = new Rover();
-    rover.command("MMRMMLM");
+    rover.executeInputs("MMRMMLM");
     const position = rover.getPosition();
     expect(position).toBe("2:3:N");
   });
 
-  it("the rover position will be '0:0:N' given the command 'MLMLMLML", () => {
+  it("the rover position will be '0:0:N' given the input 'MLMLMLML", () => {
     const rover = new Rover();
-    rover.command("MLMLMLML");
+    rover.executeInputs("MLMLMLML");
     const position = rover.getPosition();
     expect(position).toBe("0:0:N");
   });
 
-  it("the rover position will be '0:0:N' given the command 'MMMMMMMMMM", () => {
+  it("the rover position will be '0:0:N' given the input 'MMMMMMMMMM", () => {
     const rover = new Rover();
-    rover.command("MMMMMMMMMM");
+    rover.executeInputs("MMMMMMMMMM");
     const position = rover.getPosition();
     expect(position).toBe("0:0:N");
   });
 
-  it("the rover position will be '0:0:N' given the command 'RMMMMMMMMMMRRR", () => {
+  it("the rover position will be '0:0:N' given the input 'RMMMMMMMMMMRRR", () => {
     const rover = new Rover();
-    rover.command("RMMMMMMMMMMRRR");
+    rover.executeInputs("RMMMMMMMMMMRRR");
     const position = rover.getPosition();
     expect(position).toBe("0:0:N");
   });
 
-  it("the rover position will be '0:0:N' given the command 'RRMMMMMMMMMMRR", () => {
+  it("the rover position will be '0:0:N' given the input 'RRMMMMMMMMMMRR", () => {
     const rover = new Rover();
-    rover.command("RRMMMMMMMMMMRR");
+    rover.executeInputs("RRMMMMMMMMMMRR");
     const position = rover.getPosition();
     expect(position).toBe("0:0:N");
   });
